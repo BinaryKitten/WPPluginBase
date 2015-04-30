@@ -5,6 +5,7 @@ class Plugin
 {
     const PLUGIN_VERSION = 1; // update to trigger next migrations
     static $classes = array(
+        'Admin\ChangeFooter'
     );
     protected $pluginDir = '';
 
