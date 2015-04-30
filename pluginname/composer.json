@@ -1,0 +1,16 @@
+{
+    "name": "binarykitten/pluginname",
+    "description": "Plugin for wordpress",
+    "type": "Plugin",
+    "authors": [
+        {
+            "name": "BinaryKitten",
+            "email": "Kat@BinaryKitten.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+      "psr-4": {"BinaryKitten\\PluginName\\": "src/"}
+    }
+}
