@@ -38,11 +38,7 @@ class Plugin
     {
         $version = get_option(__NAMESPACE__ . '_VERSION', 0);
         $action = null;
-        if ($version < self::PLUGIN_VERSION) {
-            $action = 'update';
-        } elseif ($version > self::PLUGIN_VERSION) {
-            $action = 'rollback';
-        } else {
+        if ($version == self::PLUGIN_VERSION) {
             return;
         }
 
@@ -50,10 +46,19 @@ class Plugin
             require ABSPATH . 'wp-admin/includes/upgrade.php';
         }
 
-        for ($i = $version; $i <= self::PLUGIN_VERSION; $i++) {
-            $classname = implode("\\", array(__NAMESPACE__, "DB", "Migrate" . $i));
-            if (class_exists($classname)) {
-                call_user_func(array($classname, $action));
+        if ($version < self::PLUGIN_VERSION) {
+            for ($i = $version; $i <= self::PLUGIN_VERSION; $i++) {
+                $classname = implode("\\", array(__NAMESPACE__, "DB", "Migrate" . $i));
+                if (class_exists($classname)) {
+                    call_user_func(array($classname, 'update'));
+                }
+            }
+        } elseif ($version > self::PLUGIN_VERSION) {
+            for ($i = self::PLUGIN_VERSION; $i >= $version; $i--) {
+                $classname = implode("\\", array(__NAMESPACE__, "DB", "Migrate" . $i));
+                if (class_exists($classname)) {
+                    call_user_func(array($classname, 'rollback'));
+                }
             }
         }
 
