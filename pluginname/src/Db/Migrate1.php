@@ -3,12 +3,12 @@
 namespace BinaryKitten\PluginName\Db;
 
 
-class Migrate1
-{
-    public static function update()
-    {
-        global $wpdb;
+use WPDB;
 
+class Migrate1 implements MigrationInterface
+{
+    public static function update(WPDB $wpdb)
+    {
         $table_name = $wpdb->prefix . 'plugin_table';
 
         $SQL = <<<EO_SQL
@@ -22,5 +22,10 @@ EO_SQL;
 
         dbDelta($SQL);
 
+    }
+
+    public static function rollback(WPDB $wpdb)
+    {
+        // TODO: Implement rollback() method.
     }
 }

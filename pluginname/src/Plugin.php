@@ -1,6 +1,8 @@
 <?php
 namespace BinaryKitten\PluginName;
 
+use BinaryKitten\PluginName\Db\MigrationInterface;
+
 class Plugin
 {
     const PLUGIN_VERSION = 1; // update to trigger next migrations
@@ -49,14 +51,14 @@ class Plugin
         if ($version < self::PLUGIN_VERSION) {
             for ($i = $version; $i <= self::PLUGIN_VERSION; $i++) {
                 $classname = implode("\\", array(__NAMESPACE__, "DB", "Migrate" . $i));
-                if (class_exists($classname)) {
+                if (class_exists($classname) && $classname instanceof MigrationInterface) {
                     call_user_func(array($classname, 'update'));
                 }
             }
         } elseif ($version > self::PLUGIN_VERSION) {
             for ($i = self::PLUGIN_VERSION; $i >= $version; $i--) {
                 $classname = implode("\\", array(__NAMESPACE__, "DB", "Migrate" . $i));
-                if (class_exists($classname)) {
+                if (class_exists($classname) && $classname instanceof MigrationInterface) {
                     call_user_func(array($classname, 'rollback'));
                 }
             }
