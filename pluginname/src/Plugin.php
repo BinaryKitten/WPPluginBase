@@ -38,6 +38,9 @@ class Plugin
 
     public function activation()
     {
+        /** @var \WPDB $wpdb **/
+        global $wpdb;
+
         $version = get_option(__NAMESPACE__ . '_VERSION', 0);
         $action = null;
         if ($version == self::PLUGIN_VERSION) {
@@ -52,14 +55,14 @@ class Plugin
             for ($i = $version; $i <= self::PLUGIN_VERSION; $i++) {
                 $classname = implode("\\", array(__NAMESPACE__, "DB", "Migrate" . $i));
                 if (class_exists($classname) && $classname instanceof MigrationInterface) {
-                    call_user_func(array($classname, 'update'));
+                    call_user_func(array($classname, 'update'), $wpdb);
                 }
             }
         } elseif ($version > self::PLUGIN_VERSION) {
             for ($i = self::PLUGIN_VERSION; $i >= $version; $i--) {
                 $classname = implode("\\", array(__NAMESPACE__, "DB", "Migrate" . $i));
                 if (class_exists($classname) && $classname instanceof MigrationInterface) {
-                    call_user_func(array($classname, 'rollback'));
+                    call_user_func(array($classname, 'rollback'), $wpdb);
                 }
             }
         }
