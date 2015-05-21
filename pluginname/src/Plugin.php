@@ -41,7 +41,12 @@ class Plugin
         /** @var \WPDB $wpdb **/
         global $wpdb;
 
-        $version = get_option(__NAMESPACE__ . '_VERSION', 0);
+        $version = get_option(__NAMESPACE__ . '_VERSION');
+        if ($version === false && 'plugins_loaded' == current_filter()) {
+            return;
+        } elseif ($version === false) {
+            $version = 0;
+        }
         $action = null;
         if ($version == self::PLUGIN_VERSION) {
             return;
