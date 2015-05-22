@@ -10,4 +10,4 @@ namespace BinaryKitten\PluginName;
 
 require plugin_dir_path(__FILE__) . '/vendor/autoload.php';
 
-new Plugin(plugin_dir_path(__FILE__));
+new Plugin(plugin_dir_path(__FILE__), __FILE__);

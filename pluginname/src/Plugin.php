@@ -11,10 +11,14 @@ class Plugin
     );
     protected $pluginDir = '';
 
-    public function __construct($pluginDir)
+    /**
+     * @param string $pluginDir Location of plugin - used to handle file loading etc
+     * @param string $pluginFile Filename of the plugin - used for activation hooks
+     */
+    public function __construct($pluginDir ,$pluginFile)
     {
         $this->pluginDir = $pluginDir;
-        register_activation_hook(__FILE__, array($this, 'activation'));
+        register_activation_hook($pluginFile, array($this, 'activation'));
         add_action('plugins_loaded', array($this, 'activation'));
 
         foreach (self::$classes as $class) {
