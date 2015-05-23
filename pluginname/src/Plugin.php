@@ -60,21 +60,32 @@ class Plugin
             require ABSPATH . 'wp-admin/includes/upgrade.php';
         }
 
+        $results = array();
+        $classPrefix = implode("\\", array(__NAMESPACE__, "Db", "Migrate"));
+        $migrationInterface = implode("\\", array(__NAMESPACE__, "Db", "MigrationInterface"));
         if ($version < self::PLUGIN_VERSION) {
-            for ($i = $version; $i <= self::PLUGIN_VERSION; $i++) {
-                $classname = implode("\\", array(__NAMESPACE__, "DB", "Migrate" . $i));
-                if (class_exists($classname) && $classname instanceof MigrationInterface) {
-                    call_user_func(array($classname, 'update'), $wpdb);
+            for ($i = ($version+1); $i <= self::PLUGIN_VERSION; $i++) {
+                $className = $classPrefix . $i;
+                if (class_exists($className)) {
+                    $implements = class_implements($className);
+                    if(in_array($migrationInterface, $implements)) {
+                        $results[] = call_user_func(array($className, 'update'), $wpdb);
+                    }
                 }
             }
         } elseif ($version > self::PLUGIN_VERSION) {
-            for ($i = self::PLUGIN_VERSION; $i >= $version; $i--) {
-                $classname = implode("\\", array(__NAMESPACE__, "DB", "Migrate" . $i));
-                if (class_exists($classname) && $classname instanceof MigrationInterface) {
-                    call_user_func(array($classname, 'rollback'), $wpdb);
+            for ($i = self::PLUGIN_VERSION; $i > $version; $i--) {
+                $className = $classPrefix . $i;
+                if (class_exists($className)) {
+                    $implements = class_implements($className);
+                    if(in_array($migrationInterface, $implements)) {
+                        $results[] = call_user_func(array($className, 'rollback'), $wpdb);
+                    }
                 }
             }
         }
+        update_option(__NAMESPACE__ . '_VERSION', self::PLUGIN_VERSION);
+        return $results;
 
         update_option(__NAMESPACE__ . '_VERSION', self::PLUGIN_VERSION);
     }
